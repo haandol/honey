@@ -1,2 +1,2 @@
-# hongmoa
-Slack-bot for pythonistas by Buzzni
+# buzzguy
+버즈니 slack bot
