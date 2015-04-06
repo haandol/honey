@@ -1,7 +1,0 @@
-{
-    "name": "Hongmoa",
-    "description": "A slack-bot for pythonista",
-    "repository": "https://github.com/buzzni/hongmoa",
-    "logo": "http://thum.buzzni.com/unsafe/240x0/smart/http://img.buzzni.com/X/e/q/XeqZNB7q6a",
-    "keywords": ["slack", "bot", "python"]
-}
