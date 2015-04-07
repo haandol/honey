@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import unicode_literals, print_function
+from __future__ import unicode_literals
 
 import traceback
 from itertools import imap
@@ -7,10 +7,7 @@ from functools import wraps
 
 
 def _is_contain_command(commands, message):
-    trigger = message.startswith
-    return any(
-        imap(trigger, ('!'+c.strip() for c in commands))
-    )
+    return any((message == '!'+c.strip() for c in commands))
 
 
 def _extract_tokens(message):
@@ -23,17 +20,17 @@ def on_command(commands):
         func.commands = commands
 
         @wraps(func)
-        def _decorator(client, channel, message):
+        def _decorator(robot, channel, message):
             if commands and _is_contain_command(commands, message):
                 tokens = _extract_tokens(message)
                 try:
-                    message = func(client, channel, tokens)
-                    client.rtm_send_message(channel, message)
+                    message = func(robot, channel, tokens)
+                    robot.client.rtm_send_message(channel, message)
                     return message
                 except:
-                    print('[Error] 다음이유로 메시지를 전달하지 못했습니다.')
+                    print '[Error] 다음이유로 메시지를 전달하지 못했습니다.'
                     traceback.print_exc()
-                    print('')
+                    print
                     return None
             return ''
         return _decorator
