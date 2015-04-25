@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import traceback
-from itertools import imap
 from functools import wraps
 
 
@@ -28,7 +27,7 @@ def on_command(commands):
                     robot.client.rtm_send_message(channel, message)
                     return message
                 except:
-                    print '[Error] 다음이유로 메시지를 전달하지 못했습니다.'
+                    print '[Error] Could not delivered message because ...'
                     traceback.print_exc()
                     print
                     return None

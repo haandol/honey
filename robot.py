@@ -40,7 +40,7 @@ class Robot(object):
 
     def load_apps(self):
         self.docs.append('='*14)
-        self.docs.append('홍모아 사용방법')
+        self.docs.append('Usage for Hongmoa')
         self.docs.append('='*14)
 
         apps = {}
