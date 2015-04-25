@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from decorators import on_command
 
 
-@on_command(['도움', 'help'])
+@on_command(['ㄷㅇ', '도움', 'help'])
 def run(robot, channel, tokens):
-    '''print stringdocs of each function'''
+    '''도움말을 출력해드려요'''
     return '\n'.join(robot.docs)

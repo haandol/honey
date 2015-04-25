@@ -1,8 +1,9 @@
 # coding: utf-8
 from __future__ import unicode_literals
+
 import gevent
-from gevent import monkey
-monkey.patch_all()
+import gevent.monkey
+gevent.monkey.patch_all()
 
 from redis import StrictRedis
 from importlib import import_module
@@ -14,7 +15,7 @@ from settings import APPS, SLACK_TOKEN, REDIS_URL
 class RedisBrain(object):
     def __init__(self, redis_url):
         try:
-            self.redis = StrictRedis(redis_url)
+            self.redis = StrictRedis(host=redis_url, port=7777, db=0)
         except:
             self.redis = None
 
@@ -40,7 +41,7 @@ class Robot(object):
 
     def load_apps(self):
         self.docs.append('='*14)
-        self.docs.append('Usage for Hongmoa')
+        self.docs.append('홍모아 사용방법')
         self.docs.append('='*14)
 
         apps = {}
