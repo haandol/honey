@@ -23,15 +23,15 @@ def hello_world(robot, channel, tokens):
     return 'Hello world!!'
 ```
 
-then type your command with prefix '!' in the channel that including bot
-like !hi or !hello or !하이
+then type your command with prefix `!` in the channel that including bot
+like `!hi` or `!hello` or `!하이`
 
 
 ### Tokenizer
 
-Hongmoa automatically split your message into tokens
+Hongmoa automatically split your message into tokens by whitespaces
 
-Let's assume that you typed '!memo recall this' in your channel
+Let's assume that you typed `!memo recall this` in your channel
 
 ```python
 @on_command(['memo'])
@@ -41,11 +41,18 @@ def recall(robot, channel, tokens):
     assert 'this' == tokens[1]
 ```
 
+Sometimes you want to tokens containing whitespaces,
+in that case, wrap your token with double quote(") like
+
+```bash
+!memo kill "kill -9 $(ps aux | grep gunicorn | grep -v 'grep' | awk '{print $2 }')"
+```
+
 ### Redis Brain
 
 Hongmoa supports semi-permanent storage using redis as well as Hubot.
 
-Let's assume that you typed '!memo recall this' in your channel
+Let's assume that you typed `!memo recall this` in your channel
 
 ```python
 @on_command(['ㄱㅇ', '기억', 'memo'])
@@ -58,4 +65,4 @@ def redis_brain(robot, channel, tokens):
     return robot.brain.get(key)
 ```
 
-then, Hongmoa would say 'this' to the channel
+then, Hongmoa would say `this` to the channel
