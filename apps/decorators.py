@@ -41,7 +41,8 @@ def on_command(commands):
         func.commands = commands
 
         @wraps(func)
-        def _decorator(robot, channel, message):
+        def _decorator(args):
+            robot, channel, message = args
             if commands and _is_contain_command(commands, message):
                 tokens = _extract_tokens(message)
                 try:

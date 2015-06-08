@@ -15,7 +15,7 @@ Examples are included in the apps directory.
 
 ### Command
 
-Hongmoa support multiple commands for a function
+Hongmoa supports multiple commands for a function
 
 ```python
 @on_command(['하이', 'hi', 'hello'])

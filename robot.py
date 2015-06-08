@@ -2,14 +2,17 @@
 from __future__ import unicode_literals
 
 import gevent
-import gevent.monkey
-gevent.monkey.patch_all()
+from gevent.pool import Pool
+from gevent.monkey import patch_all; patch_all()
 
 from redis import StrictRedis
 from importlib import import_module
 from slackclient import SlackClient
 
 from settings import APPS, SLACK_TOKEN, REDIS_URL
+
+
+pool = Pool(20)
 
 
 class RedisBrain(object):
@@ -56,12 +59,12 @@ class Robot(object):
 
     def handle_messages(self, messages):
         # TODO: text를 미리 보고 필요한 함수만 실행하도록 수정
-        for channel, text in messages:
-            jobs = [
-                gevent.spawn(self.apps[name].run, self, channel, text)
-                for name in self.apps
-            ]
-            gevent.joinall(jobs)
+        params = [(self, channel, text)
+                  for channel, text in messages
+                  if text.startswith('!')]
+        if params:
+            for name in self.apps:
+                pool.imap_unordered(self.apps[name].run, params)
 
     def extract_messages(self, events):
         messages = []
