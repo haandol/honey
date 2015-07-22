@@ -12,6 +12,8 @@ Like Django, you can config your bot by editing settings.py
 
 ## Installation
 
+set your SLACK_TOKEN and REDIS_URL in settings.py
+
 ```bash
 
 $pip install -r requirements.txt
