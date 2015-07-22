@@ -2,11 +2,23 @@
 
 A Slack(slack.com) for Pythonistas
 
+## Dependencies
+
+Hongmoa requires [gevent](https://github.com/gevent/gevent), [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
 ## Configuration
 
 Like Django, you can config your bot by editing settings.py
 
+## Installation
+
+```bash
+
+$pip install -r requirements.txt
+
+$python robot.py
+
+```
 
 ## Apps
 

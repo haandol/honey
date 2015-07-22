@@ -1,5 +1,9 @@
 backports.ssl-match-hostname==3.4.0.2
+gevent==1.0.2
+greenlet==0.4.7
+redis==2.10.3
 requests==2.6.0
 six==1.9.0
 slackclient==0.15
 websocket-client==0.29.0
+wheel==0.24.0
