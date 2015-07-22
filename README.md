@@ -12,7 +12,8 @@ Like Django, you can config your bot by editing settings.py
 
 ## Installation
 
-set your SLACK_TOKEN and REDIS_URL in settings.py
+set your SLACK_TOKEN and REDIS_URL in settings.py.
+if REDIS_URL does not set, all REDIS relevant features will be ignored.
 
 ```bash
 
