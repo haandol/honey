@@ -6,4 +6,4 @@ from decorators import on_command
 @on_command(['ㄷㅇ', '도움', 'help'])
 def run(robot, channel, tokens):
     '''도움말을 출력해드려요'''
-    return '\n'.join(robot.docs)
+    return channel, '\n'.join(robot.docs)

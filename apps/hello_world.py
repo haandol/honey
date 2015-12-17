@@ -6,4 +6,4 @@ from decorators import on_command
 @on_command(['ㅎㅇ', '하이', 'hi'])
 def run(robot, channel, tokens):
     '''헬로월드를 출력'''
-    return 'hello world'
+    return channel, 'hello world'

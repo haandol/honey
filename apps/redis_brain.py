@@ -14,17 +14,20 @@ HELP_MSG = [
 def run(robot, channel, tokens):
     '''홍모아 전자두뇌에 무언가를 기억시킵니다'''
 
-    if len(tokens) < 1:
-        return '\n'.join(HELP_MSG)
+    token_count = len(tokens)
+
+    if token_count < 1:
+        return channel, '\n'.join(HELP_MSG)
 
     key = tokens[0]
-    if len(tokens) == 1:
+    if token_count == 1:
         value = robot.brain.get(key)
         if value:
-            return '%s %s!' % (key, value.decode('utf-8'))
+            message = '%s %s' % (key, value.decode('utf-8'))
         else:
-            return '%s? 처음 들어보는 말이네요.' % key
+            message = '%s? 처음 들어보는 말이네요.' % key
     else:
         value = tokens[1]
         robot.brain.set(key, value)
-        return '%s %s!! 잘 기억해뒀어요.' % (key, value)
+        message = '%s %s!! 잘 기억해뒀어요.' % (key, value)
+    return channel, message

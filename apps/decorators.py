@@ -16,7 +16,8 @@ def _is_contain_command(commands, message):
         Returns:
             (bool): returns True if message contains any of commands
     '''
-    return any((message.startswith('!'+c.strip()) for c in commands))
+    command = message.split()[0]
+    return any((command == '!'+c.strip() for c in commands))
 
 
 def _extract_tokens(message):
@@ -46,9 +47,12 @@ def on_command(commands):
             if commands and _is_contain_command(commands, message):
                 tokens = _extract_tokens(message)
                 try:
-                    message = func(robot, channel, tokens)
-                    robot.client.rtm_send_message(channel, message)
-                    return message
+                    channel, message = func(robot, channel, tokens)
+                    if channel:
+                        robot.client.rtm_send_message(channel, message)
+                        return message
+                    else:
+                        print "[Warn] Couldn't delivered a message"
                 except:
                     print "[Error] Could't delivered a message for this reason"
                     traceback.print_exc()
