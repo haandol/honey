@@ -21,9 +21,9 @@ logger = logging.getLogger()
 
 
 class RedisBrain(object):
-    def __init__(self, redis_url):
+    def __init__(self):
         try:
-            self.redis = StrictRedis(host=redis_url)
+            self.redis = StrictRedis(host=REDIS_URL)
         except Exception as e:
             logger.error(e)
             self.redis = None
@@ -44,7 +44,7 @@ class RedisBrain(object):
 class Robot(object):
     def __init__(self):
         self.client = SlackClient(SLACK_TOKEN)
-        self.brain = RedisBrain(REDIS_URL)
+        self.brain = RedisBrain()
         self.apps, self.docs = self.load_apps()
 
     def load_apps(self):
