@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/haandol/hongmoa.svg?branch=master)](https://travis-ci.org/haandol/hongmoa)
+
 # Hongmoa
 
 A Slack(slack.com) for Pythonistas
