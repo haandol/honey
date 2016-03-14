@@ -99,7 +99,7 @@ class Robot(object):
                 if events:
                     messages = self.extract_messages(events)
                     self.handle_messages(messages)
-                gevent.sleep(1)
+                gevent.sleep(0.3)
 
 
 if '__main__' == __name__:
