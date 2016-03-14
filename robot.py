@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 import gevent
+import logging
 from gevent.pool import Pool
-from gevent.monkey import patch_all; patch_all()
+from gevent.monkey import patch_all
+patch_all()
 
 from redis import StrictRedis
 from importlib import import_module
@@ -14,12 +16,16 @@ from settings import APPS, SLACK_TOKEN, REDIS_URL
 
 pool = Pool(20)
 
+CMD_PREFIX = '!'
+logger = logging.getLogger()
+
 
 class RedisBrain(object):
     def __init__(self, redis_url):
         try:
-            self.redis = StrictRedis(host=redis_url, port=7777, db=0)
-        except:
+            self.redis = StrictRedis(host=redis_url)
+        except Exception as e:
+            logger.error(e)
             self.redis = None
 
     def set(self, key, value):
@@ -38,33 +44,34 @@ class RedisBrain(object):
 class Robot(object):
     def __init__(self):
         self.client = SlackClient(SLACK_TOKEN)
-        self.docs = []
         self.brain = RedisBrain(REDIS_URL)
-        self.apps = self.load_apps()
+        self.apps, self.docs = self.load_apps()
 
     def load_apps(self):
-        self.docs.append('='*14)
-        self.docs.append('홍모아 사용방법')
-        self.docs.append('='*14)
-
+        docs = ['='*14, '홍모아 사용방법', '='*14]
         apps = {}
+
         for name in APPS:
             app = import_module('apps.%s' % name)
-            apps[name] = app
+            docs.append(
+                '!%s: %s' % (', '.join(app.run.commands), app.run.__doc__)
+            )
+            for command in app.run.commands:
+                apps[command] = app
 
-            doc = '!%s: %s' % (', '.join(app.run.commands), app.run.__doc__)
-            self.docs.append(doc)
-
-        return apps
+        return apps, docs
 
     def handle_messages(self, messages):
-        # TODO: text를 미리 보고 필요한 함수만 실행하도록 수정
-        params = [(self, channel, text)
-                  for channel, text in messages
-                  if text.startswith('!')]
-        if params:
-            for name in self.apps:
-                pool.imap_unordered(self.apps[name].run, params)
+        for channel, text in messages:
+            command, payloads = self.extract_command(text)
+            if not command:
+                continue
+
+            app = self.apps.get(command, None)
+            if not app:
+                continue
+
+            pool.apply_async(func=app.run, args=(self, channel, payloads))
 
     def extract_messages(self, events):
         messages = []
@@ -74,6 +81,16 @@ class Robot(object):
             if channel and text:
                 messages.append((channel, text))
         return messages
+
+    def extract_command(self, text):
+        if CMD_PREFIX != text[0]:
+            return (None, None)
+
+        tokens = text.split(' ', 1)
+        if 1 < len(tokens):
+            return tokens[0][1:], tokens[1]
+        else:
+            return (text[1:], '')
 
     def run(self):
         if self.client.rtm_connect():

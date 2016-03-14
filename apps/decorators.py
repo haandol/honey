@@ -6,18 +6,7 @@ import traceback
 from functools import wraps
 
 
-def _is_contain_command(commands, message):
-    '''check if there is a command in message
-
-        Args:
-            commands (list): list of command for the specific function
-            message (str): user gave message
-
-        Returns:
-            (bool): returns True if message contains any of commands
-    '''
-    command = message.split()[0]
-    return any((command == '!'+c.strip() for c in commands))
+TOKENIZE_PATTERN = re.compile(r'["“](.+?)["”]|(\S+)', re.U | re.S)
 
 
 def _extract_tokens(message):
@@ -29,12 +18,7 @@ def _extract_tokens(message):
         Returns:
             (list): tokens
     '''
-    pattern = re.compile(r'["“](.+?)["”]|(\S+)', re.U | re.S)
-    tokens = message.split(' ', 1)
-    if 1 < len(tokens):
-        return filter(lambda x: x and x.strip(), pattern.split(tokens[1]))
-    else:
-        return []
+    return filter(lambda x: x and x.strip(), TOKENIZE_PATTERN.split(message))
 
 
 def on_command(commands):
@@ -42,9 +26,9 @@ def on_command(commands):
         func.commands = commands
 
         @wraps(func)
-        def _decorator(args):
+        def _decorator(*args, **kwargs):
             robot, channel, message = args
-            if commands and _is_contain_command(commands, message):
+            if commands:
                 tokens = _extract_tokens(message)
                 try:
                     channel, message = func(robot, channel, tokens)
@@ -54,7 +38,7 @@ def on_command(commands):
                     else:
                         print "[Warn] Couldn't delivered a message"
                 except:
-                    print "[Error] Could't delivered a message for this reason"
+                    print "[Error] Couldn't delivered the message"
                     traceback.print_exc()
                     print
                     return None
