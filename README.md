@@ -58,7 +58,7 @@ def recall(robot, channel, tokens):
     assert 'this' == tokens[1]
 ```
 
-Sometimes you want to tokens containing whitespaces,
+Sometimes you want tokens containing whitespaces,
 in that case, wrap your token with double quote(") like
 
 ```bash
