@@ -2,43 +2,44 @@
 
 # Hongmoa
 
-A Slack(slack.com) for Pythonistas
+A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-Hongmoa requires [gevent](https://github.com/gevent/gevent), [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
-
-## Configuration
-
-Like Django, you can config your bot by editing settings.py
-
-## Installation
-
-set your SLACK_TOKEN and REDIS_URL in settings.py.
-if REDIS_URL does not set, all REDIS relevant features will be ignored.
+requires [gevent](https://github.com/gevent/gevent), [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
 ```bash
-
 $pip install -r requirements.txt
+```
 
-$python robot.py
+## Usage
 
+Like Django, you can config your bot by editing `settings.py`
+
+set your `SLACK_TOKEN` and `REDIS_URL` in settings.py.
+if REDIS_URL does not set, all REDIS relevant features will be ignored.
+
+### Congiure your bot
+
+1. Add your bot for your slack account at [Custom Integration Page](https://buzzni.slack.com/apps/manage/custom-integrations)
+2. open settings.py
+3. set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
+4. run `$python robot.py`
+
+### Play with it on the Slack
+
+Type command with COMMAND_PREFIX (e.g. `!` ) on the channel where the bot is on.
+
+Bot is going to respond to your commands if your bot is on the channel where you type the command.
+
+```
+!help
+!hi
 ```
 
 ## Apps
 
-Examples are included in the apps directory.
-
-
-### Usage
-
-Type command with COMMAND_PREFIX (e.g. `!` ) on the channel where the bot is in
-
-```
-!help
-
-!hi
-```
+Example apps are in the apps directory.
 
 ### Command
 
@@ -50,7 +51,7 @@ def hello_world(robot, channel, tokens):
     return 'Hello world!!'
 ```
 
-then type your command with prefix `!` in the channel that including bot
+then type your command with COMMAND_PREFIX (e.g. `!`) on the channel that including bot
 like `!hi` or `!hello` or `!하이`
 
 
@@ -93,3 +94,9 @@ def redis_brain(robot, channel, tokens):
 ```
 
 then, Hongmoa would say `this` to the channel
+
+### Register your app
+
+1. Add your app and put it into `apps` folder
+2. open `settings.py` and add your app name(like 'hello_word') to `APPS`
+3. restart your bot
