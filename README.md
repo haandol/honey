@@ -30,6 +30,16 @@ $python robot.py
 Examples are included in the apps directory.
 
 
+### Usage
+
+Type command with COMMAND_PREFIX (e.g. `!` ) on the channel where the bot is in
+
+```
+!help
+
+!hi
+```
+
 ### Command
 
 Hongmoa supports multiple commands for a function
