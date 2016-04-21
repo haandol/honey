@@ -11,7 +11,7 @@ HELP_MSG = [
 
 
 @on_command(['ㄱㅇ', '기억', 'memo'])
-def run(robot, channel, tokens):
+def run(robot, channel, user, tokens):
     '''홍모아 전자두뇌에 무언가를 기억시킵니다'''
 
     token_count = len(tokens)
