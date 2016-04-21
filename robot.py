@@ -1,12 +1,11 @@
 # coding: utf-8
 from __future__ import unicode_literals
+from gevent.monkey import patch_all
+patch_all()
 
 import gevent
 import logging
 from gevent.pool import Pool
-from gevent.monkey import patch_all
-patch_all()
-
 from redis import StrictRedis
 from importlib import import_module
 from slackclient import SlackClient
@@ -79,7 +78,7 @@ class Robot(object):
         return apps, docs
 
     def handle_messages(self, messages):
-        for channel, text in messages:
+        for channel, user, text in messages:
             command, payloads = self.extract_command(text)
             if not command:
                 continue
@@ -88,15 +87,18 @@ class Robot(object):
             if not app:
                 continue
 
-            pool.apply_async(func=app.run, args=(self, channel, payloads))
+            pool.apply_async(
+                func=app.run, args=(self, channel, user, payloads)
+            )
 
     def extract_messages(self, events):
         messages = []
-        for e in events:
-            channel = e.get('channel', '')
-            text = e.get('text', '')
-            if channel and text:
-                messages.append((channel, text))
+        for event in events:
+            channel = event.get('channel', '')
+            user = event.get('user', '')
+            text = event.get('text', '')
+            if channel and user and text:
+                messages.append((channel, user, text))
         return messages
 
     def extract_command(self, text):
