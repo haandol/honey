@@ -40,6 +40,23 @@ class RedisBrain(object):
             return self.redis.get(key)
         return None
 
+    def lpush(self, key, value):
+        if self.redis:
+            self.redis.lpush(key, value)
+            return True
+        else:
+            return False
+
+    def lpop(self, key):
+        if self.redis:
+            return self.redis.lpop(key)
+        return None
+
+    def lindex(self, key):
+        if self.redis:
+            return self.redis.lindex(key)
+        return None
+
 
 class Robot(object):
     def __init__(self):
