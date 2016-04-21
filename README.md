@@ -47,7 +47,7 @@ Hongmoa supports multiple commands for a function
 
 ```python
 @on_command(['하이', 'hi', 'hello'])
-def hello_world(robot, channel, tokens):
+def hello_world(robot, channel, user, tokens):
     return 'Hello world!!'
 ```
 
@@ -63,7 +63,7 @@ Let's assume that you typed `!memo recall this` in your channel
 
 ```python
 @on_command(['memo'])
-def recall(robot, channel, tokens):
+def recall(robot, channel, user, tokens):
     assert 2 == len(tokens)
     assert 'recall' == tokens[0]
     assert 'this' == tokens[1]
@@ -84,7 +84,7 @@ Let's assume that you typed `!memo recall this` in your channel
 
 ```python
 @on_command(['ㄱㅇ', '기억', 'memo'])
-def redis_brain(robot, channel, tokens):
+def redis_brain(robot, channel, user, tokens):
     assert 2 == len(tokens)
     key = tokens[0]
     value = tokens[1]
