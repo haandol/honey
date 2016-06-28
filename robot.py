@@ -64,7 +64,7 @@ class Robot(object):
         self.apps, self.docs = self.load_apps()
 
     def load_apps(self):
-        docs = ['='*14, '홍모아 사용방법', '='*14]
+        docs = ['='*14, 'Usage', '='*14]
         apps = {}
 
         for name in APPS:
