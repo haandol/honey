@@ -111,14 +111,34 @@ class Robot(object):
         else:
             return (text[1:], '')
 
+    def rtm_connect(self):
+        conn = None
+        try:
+            conn = self.client.rtm_connect()
+        except Exception as e:
+            logger.error(e)
+        return conn
+
+    def read_message(self):
+        events = None
+        try:
+            events = self.client.rtm_read()
+        except Exception as e:
+            logger.error(e)
+        return events
+
     def run(self):
-        if self.client.rtm_connect():
-            while True:
-                events = self.client.rtm_read()
-                if events:
-                    messages = self.extract_messages(events)
-                    self.handle_messages(messages)
-                gevent.sleep(0.3)
+        if not self.rtm_connect():
+            raise RuntimeError(
+                'Can not connect to slack client. Check your settings.'
+            )
+
+        while True:
+            events = self.read_message()
+            if events:
+                messages = self.extract_messages(events)
+                self.handle_messages(messages)
+            gevent.sleep(0.3)
 
 
 if '__main__' == __name__:
