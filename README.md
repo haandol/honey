@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/haandol/hongmoa.svg?branch=master)](https://travis-ci.org/haandol/hongmoa)
+[![Build Status](https://travis-ci.org/haandol/honey.svg?branch=master)](https://travis-ci.org/haandol/honey)
 
-# Hongmoa
+# Honey
 
 A neat [Slack](slack.com) bot for Pythonistas
 
@@ -43,7 +43,7 @@ Example apps are in the apps directory.
 
 ### Command
 
-Hongmoa supports multiple commands for a function
+Honey supports multiple commands for a function
 
 ```python
 @on_command(['하이', 'hi', 'hello'])
@@ -57,7 +57,7 @@ like `!hi` or `!hello` or `!하이`
 
 ### Tokenizer
 
-Hongmoa automatically split your message into tokens by whitespaces
+Honey automatically split your message into tokens by whitespaces
 
 Let's assume that you typed `!memo recall this` in your channel
 
@@ -78,7 +78,7 @@ in that case, wrap your token with double quote(") like
 
 ### Redis Brain
 
-Hongmoa supports semi-permanent storage using redis as well as Hubot.
+Honey supports semi-permanent storage using redis as well as Hubot.
 
 Let's assume that you typed `!memo recall this` in your channel
 
@@ -93,7 +93,7 @@ def redis_brain(robot, channel, user, tokens):
     return robot.brain.get(key)
 ```
 
-then, Hongmoa would say `this` to the channel
+then, Honey would say `this` to the channel
 
 ### Register your app
 
