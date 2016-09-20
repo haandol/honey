@@ -21,11 +21,12 @@ logger = logging.getLogger()
 
 class RedisBrain(object):
     def __init__(self):
-        try:
-            self.redis = StrictRedis(host=REDIS_URL)
-        except Exception as e:
-            logger.error(e)
-            self.redis = None
+        self.redis = None
+        if REDIS_URL:
+            try:
+                self.redis = StrictRedis(host=REDIS_URL)
+            except Exception as e:
+                logger.error(e)
 
     def set(self, key, value):
         if self.redis:
