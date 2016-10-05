@@ -5,6 +5,7 @@ patch_all()
 
 import gevent
 import logging
+import traceback
 from gevent.pool import Pool
 from redis import StrictRedis
 from importlib import import_module
@@ -78,19 +79,22 @@ class Robot(object):
 
         return apps, docs
 
-    def handle_messages(self, messages):
-        for channel, user, text in messages:
-            command, payloads = self.extract_command(text)
-            if not command:
-                continue
+    def handle_message(self, message):
+        channel, user, text = message
 
-            app = self.apps.get(command, None)
-            if not app:
-                continue
+        command, payloads = self.extract_command(text)
+        if not command:
+            return
 
-            pool.apply_async(
-                func=app.run, args=(self, channel, user, payloads)
-            )
+        app = self.apps.get(command, None)
+        if not app:
+            return
+
+        try:
+            pool.apply_async(func=app.run,
+                             args=(self, channel, user, payloads))
+        except:
+            traceback.print_exc()
 
     def extract_messages(self, events):
         messages = []
@@ -138,7 +142,8 @@ class Robot(object):
             events = self.read_message()
             if events:
                 messages = self.extract_messages(events)
-                self.handle_messages(messages)
+                for message in messages:
+                    self.handle_message(message)
             gevent.sleep(0.3)
 
 
