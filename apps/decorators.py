@@ -33,15 +33,19 @@ def on_command(commands):
                 try:
                     channel, message = func(robot, channel, user, tokens)
                     if channel:
-                        robot.client.rtm_send_message(channel, message)
+                        if dict == type(message) and 'text' in message:
+                            robot.client.server.api_call(
+                                'chat.postMessage', channel=channel, **message
+                            )
+                        else:
+                            robot.client.rtm_send_message(channel, message)
                         return message
                     else:
-                        print "[Warn] Couldn't delivered a message"
+                        print "[Warn] Can not send to empty channel"
                 except:
-                    print "[Error] Couldn't delivered the message"
+                    print "[Error] Can not deliver the message because..."
                     traceback.print_exc()
                     print
-                    return None
-            return ''
+            return None
         return _decorator
     return decorator
