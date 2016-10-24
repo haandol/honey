@@ -14,10 +14,19 @@ from slackclient import SlackClient
 from settings import APPS, SLACK_TOKEN, REDIS_URL
 
 
-pool = Pool(20)
+pool = Pool(16)
 
 CMD_PREFIX = '!'
-logger = logging.getLogger()
+
+logger = logging.getLogger('honey')
+logger.setLevel(logging.INFO)
+
+log_file_handler = logging.FileHandler('honey.log')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+log_file_handler.setFormatter(formatter)
+logger.addHandler(log_file_handler)
 
 
 class RedisBrain(object):
