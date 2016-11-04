@@ -35,8 +35,8 @@ class RedisBrain(object):
         if REDIS_URL:
             try:
                 self.redis = StrictRedis(host=REDIS_URL)
-            except Exception as e:
-                logger.error(e)
+            except:
+                logger.error(traceback.format_exc())
 
     def set(self, key, value):
         if self.redis:
@@ -129,16 +129,18 @@ class Robot(object):
         conn = None
         try:
             conn = self.client.rtm_connect()
-        except Exception as e:
-            logger.error(e)
-        return conn
+        except:
+            logger.error(traceback.format_exc())
+        else:
+            return conn
 
     def read_message(self):
         events = None
         try:
             events = self.client.rtm_read()
-        except Exception as e:
-            logger.error(e)
+        except:
+            logger.error(traceback.format_exc())
+            self.rtm_connect()
         return events
 
     def run(self):
