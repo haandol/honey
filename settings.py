@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 
-APPS = ['hello_world', 'helper', 'ghost']
+APPS = ['hello_world', 'helper', 'giphy', 'ghost']
 
 SLACK_TOKEN = None
 
