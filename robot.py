@@ -11,10 +11,10 @@ from redis import StrictRedis
 from importlib import import_module
 from slackclient import SlackClient
 
-from settings import APPS, SLACK_TOKEN, REDIS_URL
+from settings import APPS, SLACK_TOKEN, REDIS_URL, POOL_SIZE
 
 
-pool = Pool(16)
+pool = Pool(POOL_SIZE)
 
 CMD_PREFIX = '!'
 
