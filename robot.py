@@ -11,12 +11,10 @@ from redis import StrictRedis
 from importlib import import_module
 from slackclient import SlackClient
 
-from settings import APPS, SLACK_TOKEN, REDIS_URL, POOL_SIZE
+from settings import APPS, CMD_PREFIX, SLACK_TOKEN, REDIS_URL, POOL_SIZE
 
 
 pool = Pool(POOL_SIZE)
-
-CMD_PREFIX = '!'
 
 logger = logging.getLogger('honey')
 logger.setLevel(logging.INFO)
