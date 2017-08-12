@@ -21,10 +21,11 @@ if REDIS_URL does not set, all REDIS relevant features will be ignored.
 
 ### Congiure your bot
 
-1. Add your bot for your slack account at [Custom Integration Page](https://buzzni.slack.com/apps/manage/custom-integrations)
-2. open settings.py
-3. set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
-4. run `$python robot.py`
+1. Add your bot for your slack account at [Custom Integration Page](https://my.slack.com/services/new/bot)
+2. Copy API Token to clipboard
+2. Open settings.py
+3. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
+4. Run `$python robot.py`
 
 ### Play with it on the Slack
 
