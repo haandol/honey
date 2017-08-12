@@ -11,7 +11,9 @@ from redis import StrictRedis
 from importlib import import_module
 from slackclient import SlackClient
 
-from settings import APPS, CMD_PREFIX, SLACK_TOKEN, REDIS_URL, POOL_SIZE
+from settings import (
+    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL, POOL_SIZE
+)
 
 
 pool = Pool(POOL_SIZE)
@@ -78,9 +80,9 @@ class Robot(object):
 
         for name in APPS:
             app = import_module('apps.%s' % name)
-            docs.append(
-                '!%s: %s' % (', '.join(app.run.commands), app.run.__doc__)
-            )
+            docs.append('{0}{1}: {2}'.format(
+                CMD_PREFIX, ', '.join(app.run.commands), app.run.__doc__
+            ))
             for command in app.run.commands:
                 apps[command] = app
 
@@ -90,6 +92,7 @@ class Robot(object):
         channel, user, text = message
 
         command, payloads = self.extract_command(text)
+        print command, payloads
         if not command:
             return
 
@@ -114,14 +117,14 @@ class Robot(object):
         return messages
 
     def extract_command(self, text):
-        if CMD_PREFIX != text[0]:
+        if CMD_PREFIX and CMD_PREFIX != text[0]:
             return (None, None)
 
         tokens = text.split(' ', 1)
         if 1 < len(tokens):
-            return tokens[0][1:], tokens[1]
+            return tokens[0][CMD_LENGTH:], tokens[1]
         else:
-            return (text[1:], '')
+            return (text[CMD_LENGTH:], '')
 
     def rtm_connect(self):
         conn = None

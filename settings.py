@@ -7,6 +7,7 @@ SLACK_TOKEN = None
 REDIS_URL = None
 
 CMD_PREFIX = '!'
+CMD_LENGTH = len(CMD_PREFIX)
 
 # gevent pool size
 POOL_SIZE = 20
