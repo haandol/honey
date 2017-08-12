@@ -92,7 +92,6 @@ class Robot(object):
         channel, user, text = message
 
         command, payloads = self.extract_command(text)
-        print command, payloads
         if not command:
             return
 
