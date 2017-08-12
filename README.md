@@ -26,6 +26,7 @@ if REDIS_URL does not set, all REDIS relevant features will be ignored.
 2. Open settings.py
 3. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
 4. Run `$python robot.py`
+5. Invite your bot to the channel `/invite @honey`
 
 ### Play with it on the Slack
 
