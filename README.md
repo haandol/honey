@@ -16,21 +16,21 @@ $pip install -r requirements.txt
 
 Like Django, you can config your bot by editing `settings.py`
 
-set your `SLACK_TOKEN` and `REDIS_URL` in settings.py.
-if REDIS_URL does not set, all REDIS relevant features will be ignored.
+set `SLACK_TOKEN` variable in settings.py.
+if `REDIS_URL` or `REDIS_PORT` is not setted, all Reids relevant features, like redis_brain, will be ignored.
 
 ### Congiure your bot
 
 1. Add your bot for your slack account at [Custom Integration Page](https://my.slack.com/services/new/bot)
-2. Copy API Token to clipboard
-2. Open settings.py
+2. Copy API Token to clipboard.
+2. Open `settings.py`
 3. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
 4. Run `$python robot.py`
 5. Invite your bot to the channel `/invite @honey`
 
 ### Play with it on the Slack
 
-Type command with COMMAND_PREFIX (e.g. `!` ) on the channel where the bot is on.
+Type command with Command Prefix (default is `!` ) on the channel where the bot is on.
 
 Bot is going to respond to your commands if your bot is on the channel where you type the command.
 
@@ -41,64 +41,79 @@ Bot is going to respond to your commands if your bot is on the channel where you
 
 ## Apps
 
-Example apps are in the apps directory.
+We call each function that you plugged-in to the Honey, the app.
 
-### Command
+Built-in and example apps are in the `apps` directory.
 
-Honey supports multiple commands for a function
+### App and Command
+
+Below is basic form of app.
+It just says `Hello world!!` to the channel that user typed the command, `!hi`.
 
 ```python
-@on_command(['하이', 'hi', 'hello'])
+@on_command(['hi', 'hello', '하이', 'ㅎㅇ'])
 def hello_world(robot, channel, user, tokens):
-    return 'Hello world!!'
+    '''
+        Simple app just says `Hello word!!`
+
+        @params {object} robot - Honey bot instance
+        @params {str} channel - channel name where invoked this app
+        @params {str} user - user id who invoked this app
+        @params {list} tokens - user input tokens
+        @returns {str, str} - channel name, message
+    '''
+    return channel, 'Hello world!!'
 ```
 
-then type your command with COMMAND_PREFIX (e.g. `!`) on the channel that including bot
-like `!hi` or `!hello` or `!하이`
+And Honey supports multiple commands for each function.
+
+The above app can be invoked the command with Command Prefix (default is `!`) on the channel.
+It would be `!hello`, `!hi`, `!하이` or '!ㅎㅇ'
 
 
 ### Tokenizer
 
-Honey automatically split your message into tokens by whitespaces
+Honey automatically split your message into tokens by whitespaces.
 
-Let's assume that you typed `!memo recall this` in your channel
+Let's assume that you typed `!memo remember this` with blow app.
 
 ```python
 @on_command(['memo'])
-def recall(robot, channel, user, tokens):
+def remember(robot, channel, user, tokens):
     assert 2 == len(tokens)
-    assert 'recall' == tokens[0]
+    assert 'remember' == tokens[0]
     assert 'this' == tokens[1]
+    return channel, tokens[1]
 ```
 
-Sometimes you want tokens containing whitespaces,
-in that case, wrap your token with double quote(") like
+You may want tokens containing whitespaces.
+In that case, wrap your token with double quote(") like
 
 ```bash
-!memo kill "kill -9 $(ps aux | grep gunicorn | grep -v 'grep' | awk '{print $2 }')"
+!memo remember "kill -9 $(ps aux | grep gunicorn | grep -v 'grep' | awk '{print $2 }')"
 ```
 
 ### Redis Brain
 
-Honey supports semi-permanent storage using redis as well as Hubot.
+Honey supports semi-permanent storage using Redis as well as Hubot.
 
 Let's assume that you typed `!memo recall this` in your channel
 
 ```python
-@on_command(['ㄱㅇ', '기억', 'memo'])
+@on_command(['memo', 'ㄱㅇ', '기억'])
 def redis_brain(robot, channel, user, tokens):
     assert 2 == len(tokens)
     key = tokens[0]
     value = tokens[1]
     robot.brain.set(key, value)
 
-    return robot.brain.get(key)
+    return channel, robot.brain.get(key)
 ```
 
-then, Honey would say `this` to the channel
+then, Honey would say `this` to the channel.
 
 ### Register your app
 
 1. Add your app and put it into `apps` folder
-2. open `settings.py` and add your app name(like 'hello_word') to `APPS`
+2. open `settings.py` and add your app name(like 'hello_world') to `APPS`
 3. restart your bot
