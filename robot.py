@@ -12,7 +12,8 @@ from importlib import import_module
 from slackclient import SlackClient
 
 from settings import (
-    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL, POOL_SIZE
+    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL, REDIS_PORT,
+    POOL_SIZE
 )
 
 
@@ -32,9 +33,9 @@ logger.addHandler(log_file_handler)
 class RedisBrain(object):
     def __init__(self):
         self.redis = None
-        if REDIS_URL:
+        if REDIS_URL and REDIS_PORT:
             try:
-                self.redis = StrictRedis(host=REDIS_URL)
+                self.redis = StrictRedis(host=REDIS_URL, port=REDIS_PORT)
             except:
                 logger.error(traceback.format_exc())
 
