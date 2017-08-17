@@ -26,17 +26,18 @@ if `REDIS_URL` or `REDIS_PORT` is not setted, all Reids relevant features, like 
 2. Open `settings.py`
 3. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
 4. Run `$python robot.py`
-5. Invite your bot to the channel `/invite @honey`
+5. Invite your bot to the channel `/invite @YOUR_BOT_NAME`
 
 ### Play with it on the Slack
 
 Type command with Command Prefix (default is `!` ) on the channel where the bot is on.
 
-Bot is going to respond to your commands if your bot is on the channel where you type the command.
+Honey is going to respond to your command kindly.
 
 ```
-!help
-!hi
+YOU: !help
+
+Honey: Hello world!!
 ```
 
 ## Apps
