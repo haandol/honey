@@ -34,7 +34,7 @@ def on_command(commands):
                     channel, message = func(robot, channel, user, tokens)
                     if channel:
                         if dict == type(message) and 'text' in message:
-                            robot.client.server.api_call(
+                            robot.client.api_call(
                                 'chat.postMessage', channel=channel, **message
                             )
                         else:
