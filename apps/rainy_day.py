@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 from decorators import on_command
 
+from gevent.monkey import patch_all
+patch_all()
+
 import requests
 from bs4 import BeautifulSoup as Soup
 

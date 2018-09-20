@@ -38,7 +38,7 @@ def on_command(commands):
                                 'chat.postMessage', channel=channel, **message
                             )
                         else:
-                            robot.client.rtm_send_message(channel, message)
+                            robot.client.rtm_send_message(channel, str(message))
                         return message
                     else:
                         print "[Warn] Can not send to empty channel"
