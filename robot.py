@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 from gevent.monkey import patch_all
 patch_all()
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import gevent
 import logging
 import traceback
