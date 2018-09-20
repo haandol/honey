@@ -129,11 +129,14 @@ class Robot(object):
     def rtm_connect(self):
         conn = None
         try:
-            conn = self.client.rtm_connect()
+            conn = self.client.rtm_connect(with_team_state=False)
         except:
             logger.error(traceback.format_exc())
         else:
             return conn
+
+    def rtm_is_connected(self):
+        return self.client.server.connected
 
     def read_message(self):
         events = None
