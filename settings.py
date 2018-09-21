@@ -16,4 +16,4 @@ CMD_LENGTH = len(CMD_PREFIX)
 POOL_SIZE = 20
 
 # add your app name to this list
-APPS = ['hello_world', 'helper', 'giphy', 'ghost']
+APPS = ['helper']
