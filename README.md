@@ -100,17 +100,6 @@ Honey supports semi-permanent storage using Redis as well as Hubot.
 
 Let's assume that you typed `!memo whats this` in your channel with below app.
 
-```python
-@on_command(['memo', 'ㄱㅇ', '기억'])
-def redis_brain(robot, channel, user, tokens):
-    assert 2 == len(tokens)
-    key = tokens[0]
-    value = tokens[1]
-    robot.brain.set(key, value)
-
-    return channel, robot.brain.get(key)
-```
-
 after that, whenever you type `!memo whats` Honey will says `this` to the channel.
 
 ### Register your app
