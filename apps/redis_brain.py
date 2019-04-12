@@ -39,12 +39,12 @@ async def run(robot, channel, user, tokens):
     if token_count == 1:
         value = await robot.brain.get(key)
         if value:
-            message = '[%s]: %s' % (key, value)
+            message = '%s: %s' % (key, value)
         else:
-            message = '[%s]? 처음 듣는 말이네요.' % key
+            message = '%s? 처음 듣는 말이네요.' % key
     else:
         value = tokens[1]
         await update_brain_key(robot.brain, key)
         await robot.brain.set(key, value)
-        message = '메모해두었습니다.\n[%s]: %s' % (key, value)
+        message = '메모해두었습니다.\n%s: %s' % (key, value)
     return channel, message
