@@ -1,27 +1,15 @@
-# coding: utf-8
-from __future__ import unicode_literals
-from gevent.monkey import patch_all
-patch_all()
-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-import gevent
+import asyncio
 import logging
 import traceback
-from gevent.pool import Pool
-from redis import StrictRedis
+import aioredis
+from async_timeout import timeout
 from importlib import import_module
 from slackclient import SlackClient
 
 from settings import (
-    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL, REDIS_PORT,
-    POOL_SIZE
+    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL,
 )
 
-
-pool = Pool(POOL_SIZE)
 
 logger = logging.getLogger('honey')
 logger.setLevel(logging.INFO)
@@ -37,40 +25,60 @@ logger.addHandler(log_file_handler)
 class RedisBrain(object):
     def __init__(self):
         self.redis = None
-        if REDIS_URL and REDIS_PORT:
-            try:
-                self.redis = StrictRedis(host=REDIS_URL, port=REDIS_PORT)
-            except:
-                logger.error(traceback.format_exc())
 
-    def set(self, key, value):
-        if self.redis:
-            self.redis.set(key, value)
-            return True
-        else:
+    async def connect(self, timeout_secs=10):
+        if not REDIS_URL:
+            logger.info('No brain on this bot.')
+            return
+        
+        logger.info('Brain Connecting...')
+        try:
+            async with timeout(timeout_secs):
+                while not self.redis:
+                    try:
+                        self.redis = await aioredis.create_redis(REDIS_URL)
+                    except:
+                        logger.error(traceback.format_exc())
+                    await asyncio.sleep(1)
+        except asyncio.TimeoutError as e:
+            logger.error(traceback.format_exc())
+            raise e
+        logger.info('Brain Connected: {}'.format(REDIS_URL))
+
+    async def set(self, key, value):
+        if not self.redis:
             return False
 
-    def get(self, key):
-        if self.redis:
-            return self.redis.get(key)
-        return None
+        await self.redis.set(key, value)
+        return True
 
-    def lpush(self, key, value):
-        if self.redis:
-            self.redis.lpush(key, value)
-            return True
-        else:
+    async def get(self, key):
+        if not self.redis:
+            return None
+
+        value = await self.redis.get(key)
+        return value.decode('utf-8') if value else ''
+
+    async def lpush(self, key, value):
+        if not self.redis:
             return False
 
-    def lpop(self, key):
-        if self.redis:
-            return self.redis.lpop(key)
-        return None
+        await self.redis.lpush(key, value)
+        return True
 
-    def lindex(self, key):
-        if self.redis:
-            return self.redis.lindex(key)
-        return None
+    async def lpop(self, key):
+        if not self.redis:
+            return None
+
+        value = await self.redis.lpop(key)
+        return value.decode('utf-8') if value else ''
+
+    async def disconnect(self):
+        if not self.redis:
+            return
+
+        await self.redis.close()
+        logger.info('Brain disconnected.')
 
 
 class Robot(object):
@@ -93,7 +101,7 @@ class Robot(object):
 
         return apps, docs
 
-    def handle_message(self, message):
+    async def handle_message(self, message):
         channel, user, text = message
 
         command, payloads = self.extract_command(text)
@@ -105,8 +113,7 @@ class Robot(object):
             return
 
         try:
-            pool.apply_async(func=app.run,
-                             args=(self, channel, user, payloads))
+            await app.run(self, channel, user, payloads)
         except:
             traceback.print_exc()
 
@@ -130,42 +137,59 @@ class Robot(object):
         else:
             return (text[CMD_LENGTH:], '')
 
-    def rtm_connect(self):
-        conn = None
+    async def rtm_connect(self, timeout_secs=10):
+        logger.info('RTM Connecting...')
         try:
-            conn = self.client.rtm_connect(with_team_state=False)
+            async with timeout(timeout_secs):
+                while not self.client.server.connected:
+                    try:
+                        self.client.rtm_connect(with_team_state=False)
+                    except:
+                        logger.error(traceback.format_exc())
+                    await asyncio.sleep(1)
+        except asyncio.TimeoutError as e:
+            logger.error(traceback.format_exc())
+            raise e
+        logger.info('RTM Connected.')
+
+    async def read_message(self):
+        try:
+            return self.client.rtm_read()
         except:
             logger.error(traceback.format_exc())
-        else:
-            return conn
+            # try to recover connection
+            await self.rtm_connect()
 
-    def rtm_is_connected(self):
-        return self.client.server.connected
-
-    def read_message(self):
-        events = None
-        try:
-            events = self.client.rtm_read()
-        except:
-            logger.error(traceback.format_exc())
-            self.rtm_connect()
-        return events
-
-    def run(self):
-        if not self.rtm_connect():
+    async def run(self):
+        await self.brain.connect()
+        await self.rtm_connect()
+        if not self.client.server.connected:
             raise RuntimeError(
                 'Can not connect to slack client. Check your settings.'
             )
 
         while True:
-            events = self.read_message()
+            events = await self.read_message()
             if events:
                 messages = self.extract_messages(events)
-                for message in messages:
-                    self.handle_message(message)
-            gevent.sleep(0.3)
+                if messages:
+                    tasks = [asyncio.ensure_future(self.handle_message(message))
+                             for message in messages]
+                    await asyncio.gather(*tasks)
+            await asyncio.sleep(0.3)
+
+    async def disconnect(self):
+        await self.brain.disconnect()
+        await self.client.server.websocket.close()
+        logger.info('RTM disconnected.')
 
 
 if '__main__' == __name__:
     robot = Robot()
-    robot.run()
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(robot.run())
+    finally:
+        robot.disconnect()
+        loop.close()
+        logger.info('Honey Shutdown.')

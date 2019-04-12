@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 import traceback
 from functools import wraps
@@ -18,7 +15,7 @@ def _extract_tokens(message):
         Returns:
             (list): tokens
     '''
-    return filter(lambda x: x and x.strip(), TOKENIZE_PATTERN.split(message))
+    return list(filter(lambda x: x and x.strip(), TOKENIZE_PATTERN.split(message)))
 
 
 def on_command(commands):
@@ -26,12 +23,11 @@ def on_command(commands):
         func.commands = commands
 
         @wraps(func)
-        def _decorator(*args, **kwargs):
-            robot, channel, user, message = args
+        async def _decorator(robot, channel, user, message):
             if commands:
                 tokens = _extract_tokens(message)
                 try:
-                    channel, message = func(robot, channel, user, tokens)
+                    channel, message = await func(robot, channel, user, tokens)
                     if channel:
                         if dict == type(message) and 'text' in message:
                             robot.client.api_call(
@@ -41,11 +37,11 @@ def on_command(commands):
                             robot.client.rtm_send_message(channel, str(message))
                         return message
                     else:
-                        print "[Warn] Can not send to empty channel"
+                        print("[Warn] Can not send to empty channel")
                 except:
-                    print "[Error] Can not deliver the message because..."
+                    print("[Error] Can not deliver the message because...")
                     traceback.print_exc()
-                    print
+                    print()
             return None
         return _decorator
     return decorator
