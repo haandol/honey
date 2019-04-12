@@ -1,84 +1,12 @@
 import asyncio
-import logging
 import traceback
-import aioredis
 from async_timeout import timeout
 from importlib import import_module
 from slackclient import SlackClient
 
-from settings import (
-    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL,
-)
-
-
-logger = logging.getLogger('honey')
-logger.setLevel(logging.INFO)
-
-log_file_handler = logging.FileHandler('honey.log')
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-log_file_handler.setFormatter(formatter)
-logger.addHandler(log_file_handler)
-
-
-class RedisBrain(object):
-    def __init__(self):
-        self.redis = None
-
-    async def connect(self, timeout_secs=10):
-        if not REDIS_URL:
-            logger.info('No brain on this bot.')
-            return
-        
-        logger.info('Brain Connecting...')
-        try:
-            async with timeout(timeout_secs):
-                while not self.redis:
-                    try:
-                        self.redis = await aioredis.create_redis(REDIS_URL)
-                    except:
-                        logger.error(traceback.format_exc())
-                    await asyncio.sleep(1)
-        except asyncio.TimeoutError as e:
-            logger.error(traceback.format_exc())
-            raise e
-        logger.info('Brain Connected: {}'.format(REDIS_URL))
-
-    async def set(self, key, value):
-        if not self.redis:
-            return False
-
-        await self.redis.set(key, value)
-        return True
-
-    async def get(self, key):
-        if not self.redis:
-            return None
-
-        value = await self.redis.get(key)
-        return value.decode('utf-8') if value else ''
-
-    async def lpush(self, key, value):
-        if not self.redis:
-            return False
-
-        await self.redis.lpush(key, value)
-        return True
-
-    async def lpop(self, key):
-        if not self.redis:
-            return None
-
-        value = await self.redis.lpop(key)
-        return value.decode('utf-8') if value else ''
-
-    def disconnect(self):
-        if not self.redis:
-            return
-
-        self.redis.close()
-        logger.info('Brain disconnected.')
+from loggers import logger
+from brain import RedisBrain
+from settings import APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN
 
 
 class Robot(object):
