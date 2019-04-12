@@ -73,11 +73,11 @@ class RedisBrain(object):
         value = await self.redis.lpop(key)
         return value.decode('utf-8') if value else ''
 
-    async def disconnect(self):
+    def disconnect(self):
         if not self.redis:
             return
 
-        await self.redis.close()
+        self.redis.close()
         logger.info('Brain disconnected.')
 
 
@@ -179,8 +179,8 @@ class Robot(object):
             await asyncio.sleep(0.3)
 
     async def disconnect(self):
-        await self.brain.disconnect()
-        await self.client.server.websocket.close()
+        self.brain.disconnect()
+        self.client.server.websocket.close()
         logger.info('RTM disconnected.')
 
 
