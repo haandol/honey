@@ -1,6 +1,7 @@
 import re
 import traceback
 from functools import wraps
+from loggers import logger
 
 
 TOKENIZE_PATTERN = re.compile(r'["“](.+?)["”]|(\S+)', re.U | re.S)
@@ -28,6 +29,7 @@ def on_command(commands):
                 tokens = _extract_tokens(message)
                 try:
                     channel, message = await func(robot, channel, user, tokens)
+                    logger.debug('[Debug] message: {}'.format(message))
                     if channel:
                         if dict == type(message) and 'text' in message:
                             robot.client.api_call(
@@ -37,11 +39,10 @@ def on_command(commands):
                             robot.client.rtm_send_message(channel, str(message))
                         return message
                     else:
-                        print("[Warn] Can not send to empty channel")
+                        logger.warning('Can not send to empty channel')
                 except:
-                    print("[Error] Can not deliver the message because...")
+                    logger.error('Can not deliver the message because...')
                     traceback.print_exc()
-                    print()
             return None
         return _decorator
     return decorator
