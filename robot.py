@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
 import asyncio
 import traceback
 from async_timeout import timeout
