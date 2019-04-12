@@ -6,7 +6,7 @@ A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-Python3.5.3+ (for async/await)
+Python 3.5.3+ (for async/await)
 
 [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
@@ -15,6 +15,8 @@ $pip install -r requirements.txt
 ```
 
 ## Usage
+
+If you are using Python 2.x use [0.0.3](https://github.com/haandol/honey/tree/0.0.3)
 
 Like Django, you can config your bot by editing `settings.py`
 
