@@ -6,7 +6,7 @@ A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-Python 3.5.3+ (for async/await)
+Python 3.5.3+ (for `async/await`)
 
 [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
