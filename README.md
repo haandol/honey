@@ -19,7 +19,7 @@ $pip install -r requirements.txt
 Like Django, you can config your bot by editing `settings.py`
 
 set `SLACK_TOKEN` variable in settings.py.
-if `REDIS_URL` or `REDIS_PORT` is not setted, all Redis relevant features, like redis_brain, will be disabled.
+if `REDIS_URL` is not setted, all Redis relevant features, like redis_brain, will be disabled.
 
 ### Congiure your bot
 
