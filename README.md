@@ -6,7 +6,7 @@ A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-Python3.5+ (for async/await)
+Python3.5.3+ (for async/await)
 
 [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
@@ -50,12 +50,14 @@ Built-in and example apps are in the `apps` directory.
 
 ### App and Command
 
-Below is basic form of app.
-It just says `Hello world!!` to the channel that user typed the command, `!hi`.
+Below is basic form of app. notice that the function has prefix, `async`.
+This just says `Hello world!!` to the channel when user typed the command, `!hi`.
 
 ```python
+from .decorators import on_command
+
 @on_command(['hi', 'hello', '하이', 'ㅎㅇ'])
-def hello_world(robot, channel, user, tokens):
+async def hello_world(robot, channel, user, tokens):
     '''
         Simple app just says `Hello word!!`
 
@@ -71,7 +73,7 @@ def hello_world(robot, channel, user, tokens):
 And Honey supports multiple commands for each function.
 
 The above app can be invoked the command with Command Prefix (default is `!`) on the channel.
-It would be `!hello`, `!hi`, `!하이` or '!ㅎㅇ'
+It would be `!hello`, `!hi`, `!하이` or `!ㅎㅇ`
 
 
 ### Tokenizer
@@ -82,7 +84,7 @@ Let's assume that you typed `!memo remember this` with blow app.
 
 ```python
 @on_command(['memo'])
-def remember(robot, channel, user, tokens):
+async def remember(robot, channel, user, tokens):
     assert 2 == len(tokens)
     assert 'remember' == tokens[0]
     assert 'this' == tokens[1]
@@ -100,12 +102,16 @@ In that case, wrap your token with double quote(") like
 
 Honey supports semi-permanent storage using Redis as well as Hubot.
 
+The full usage code is on `apps/redis_brain`. If you want to use the feature, just add `redis_brain` to `APPS` variable at your `settings.py`
+
 Let's assume that you typed `!memo whats this` in your channel with below app.
 
 after that, whenever you type `!memo whats` Honey will says `this` to the channel.
 
+if you forgot what you memoized, just type `!memo`. Honey let you know what she memoized before.
+
 ### Register your app
 
 1. Add your app and put it into `apps` folder
-2. open `settings.py` and add your app name(like 'hello_world') to `APPS`
+2. open `settings.py` and add your app name(like `hello_world`) to `APPS`
 3. restart your bot
