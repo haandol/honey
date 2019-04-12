@@ -46,32 +46,39 @@ class RedisBrain(object):
         logger.info('Brain Connected: {}'.format(REDIS_URL))
 
     async def set(self, key, value):
-        if self.redis:
-            self.redis.set(key, value)
-            return True
-        else:
+        if not self.redis:
             return False
+
+        await self.redis.set(key, value)
+        return True
 
     async def get(self, key):
-        if self.redis:
-            return self.redis.get(key)
-        return None
+        if not self.redis:
+            return None
+
+        value = await self.redis.get(key)
+        return value.decode('utf-8') if value else ''
 
     async def lpush(self, key, value):
-        if self.redis:
-            self.redis.lpush(key, value)
-            return True
-        else:
+        if not self.redis:
             return False
 
+        await self.redis.lpush(key, value)
+        return True
+
     async def lpop(self, key):
-        if self.redis:
-            return self.redis.lpop(key)
-        return None
+        if not self.redis:
+            return None
+
+        value = await self.redis.lpop(key)
+        return value.decode('utf-8') if value else ''
 
     async def disconnect(self):
-        if self.redis:
-            await self.redis.close()
+        if not self.redis:
+            return
+
+        await self.redis.close()
+        logger.info('Brain disconnected.')
 
 
 class Robot(object):
@@ -174,6 +181,7 @@ class Robot(object):
     async def disconnect(self):
         await self.brain.disconnect()
         await self.client.server.websocket.close()
+        logger.info('RTM disconnected.')
 
 
 if '__main__' == __name__:
@@ -184,3 +192,4 @@ if '__main__' == __name__:
     finally:
         robot.disconnect()
         loop.close()
+        logger.info('Honey Shutdown.')

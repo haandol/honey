@@ -15,7 +15,7 @@ def _extract_tokens(message):
         Returns:
             (list): tokens
     '''
-    return filter(lambda x: x and x.strip(), TOKENIZE_PATTERN.split(message))
+    return list(filter(lambda x: x and x.strip(), TOKENIZE_PATTERN.split(message)))
 
 
 def on_command(commands):
