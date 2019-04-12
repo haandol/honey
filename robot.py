@@ -25,11 +25,25 @@ logger.addHandler(log_file_handler)
 class RedisBrain(object):
     def __init__(self):
         self.redis = None
-        if REDIS_URL:
-            try:
-                self.redis = aioredis.create_redis(REDIS_URL)
-            except:
-                logger.error(traceback.format_exc())
+
+    async def connect(self, timeout_secs=10):
+        if not REDIS_URL:
+            logger.info('No brain on this bot.')
+            return
+        
+        logger.info('Brain Connecting...')
+        try:
+            async with timeout(timeout_secs):
+                while not self.redis:
+                    try:
+                        self.redis = await aioredis.create_redis(REDIS_URL)
+                    except:
+                        logger.error(traceback.format_exc())
+                    await asyncio.sleep(1)
+        except asyncio.TimeoutError as e:
+            logger.error(traceback.format_exc())
+            raise e
+        logger.info('Brain Connected: {}'.format(REDIS_URL))
 
     async def set(self, key, value):
         if self.redis:
@@ -54,6 +68,10 @@ class RedisBrain(object):
         if self.redis:
             return self.redis.lpop(key)
         return None
+
+    async def disconnect(self):
+        if self.redis:
+            await self.redis.close()
 
 
 class Robot(object):
@@ -136,6 +154,7 @@ class Robot(object):
             await self.rtm_connect()
 
     async def run(self):
+        await self.brain.connect()
         await self.rtm_connect()
         if not self.client.server.connected:
             raise RuntimeError(
@@ -153,7 +172,8 @@ class Robot(object):
             await asyncio.sleep(0.3)
 
     async def disconnect(self):
-        self.client.server.websocket.close()
+        await self.brain.disconnect()
+        await self.client.server.websocket.close()
 
 
 if '__main__' == __name__:
