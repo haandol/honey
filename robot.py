@@ -1,12 +1,13 @@
 import asyncio
 import logging
 import traceback
-from redis import StrictRedis
+import aioredis
+from async_timeout import timeout
 from importlib import import_module
 from slackclient import SlackClient
 
-from .settings import (
-    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL, REDIS_PORT,
+from settings import (
+    APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, REDIS_URL,
 )
 
 
@@ -24,9 +25,9 @@ logger.addHandler(log_file_handler)
 class RedisBrain(object):
     def __init__(self):
         self.redis = None
-        if REDIS_URL and REDIS_PORT:
+        if REDIS_URL:
             try:
-                self.redis = StrictRedis(host=REDIS_URL, port=REDIS_PORT)
+                self.redis = aioredis.create_redis(REDIS_URL)
             except:
                 logger.error(traceback.format_exc())
 
@@ -111,20 +112,20 @@ class Robot(object):
         else:
             return (text[CMD_LENGTH:], '')
 
-    async def connect(self):
-        while not self.client.server.connected:
-            try:
-                self.client.rtm_connect(with_team_state=False)
-            except:
-                logger.error(traceback.format_exc())
-            await asyncio.sleep(1)
-
-    async def rtm_connect(self, timeout=15):
+    async def rtm_connect(self, timeout_secs=10):
+        logger.info('RTM Connecting...')
         try:
-            await asyncio.wait_for(self.connect(), timeout)
+            async with timeout(timeout_secs):
+                while not self.client.server.connected:
+                    try:
+                        self.client.rtm_connect(with_team_state=False)
+                    except:
+                        logger.error(traceback.format_exc())
+                    await asyncio.sleep(1)
         except asyncio.TimeoutError as e:
             logger.error(traceback.format_exc())
             raise e
+        logger.info('RTM Connected.')
 
     async def read_message(self):
         try:
@@ -135,9 +136,7 @@ class Robot(object):
             await self.rtm_connect()
 
     async def run(self):
-        logger.info('RTM Connecting...')
         await self.rtm_connect()
-        logger.info('RTM Connected.')
         if not self.client.server.connected:
             raise RuntimeError(
                 'Can not connect to slack client. Check your settings.'

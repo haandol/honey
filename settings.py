@@ -2,8 +2,7 @@
 SLACK_TOKEN = ''
 
 # set redis url if you want to enable redis related functions like redis_brain
-REDIS_URL = None
-REDIS_PORT = 6379
+REDIS_URL = None    # redis://localhost:6379
 
 # command prefix
 CMD_PREFIX = '!'
