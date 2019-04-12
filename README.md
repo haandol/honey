@@ -6,7 +6,9 @@ A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-requires [gevent](https://github.com/gevent/gevent), [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
+Python3.5+ (for async/await)
+
+[redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
 ```bash
 $pip install -r requirements.txt

@@ -1,6 +1,4 @@
-# coding: utf-8
-from __future__ import unicode_literals
-from decorators import on_command
+from .decorators import on_command
 
 
 HELP_MSG = [
@@ -15,24 +13,24 @@ HELP_MSG = [
 BRAIN_KEY = 'brain_key'
 
 
-def update_brain_key(brain, key):
-    keys = brain.get(BRAIN_KEY)
+async def update_brain_key(brain, key):
+    keys = await brain.get(BRAIN_KEY)
     if keys:
         L = set(keys.decode('utf-8').split(','))
         if key not in L:
             L.add(key)
     else:
         L = [key]
-    brain.set(BRAIN_KEY, ','.join(L))
+    await brain.set(BRAIN_KEY, ','.join(L))
 
 
 @on_command(['ㄱㅇ', '기억', 'memo'])
-def run(robot, channel, user, tokens):
+async def run(robot, channel, user, tokens):
     '''홍모아 전자두뇌에 무언가를 기억시킵니다'''
     token_count = len(tokens)
 
     if token_count < 1:
-        keys = robot.brain.get(BRAIN_KEY)
+        keys = await robot.brain.get(BRAIN_KEY)
         if keys:
             keys = keys.decode('utf-8')
         else:
@@ -41,14 +39,14 @@ def run(robot, channel, user, tokens):
 
     key = tokens[0]
     if token_count == 1:
-        value = robot.brain.get(key)
+        value = await robot.brain.get(key)
         if value:
             message = '%s %s' % (key, value.decode('utf-8'))
         else:
             message = '%s? 처음 들어보는 말이네요.' % key
     else:
         value = tokens[1]
-        update_brain_key(robot.brain, key)
-        robot.brain.set(key, value)
+        await update_brain_key(robot.brain, key)
+        await robot.brain.set(key, value)
         message = '%s %s!! 잘 기억해뒀어요.' % (key, value)
     return channel, message
