@@ -23,12 +23,13 @@ if `REDIS_URL` is not setted, all Redis relevant features, like redis_brain, wil
 
 ### Congiure your bot
 
-1. Add your bot for your slack account at [Custom Integration Page](https://my.slack.com/services/new/bot)
-2. Copy API Token to clipboard.
-2. Open `settings.py`
-3. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
-4. Run `$python robot.py`
-5. Invite your bot to the channel `/invite @YOUR_BOT_NAME`
+1. install dependencies
+2. Add your bot for your slack account at [Custom Integration Page](https://my.slack.com/services/new/bot)
+3. Copy API Token to clipboard.
+4. Open `settings.py`
+5. Set `SLACK_TOKEN`. You can set `REDIS_URL` if it's available.
+6. Run `$python robot.py`. Python 3.5.3+ is required.
+7. Invite your bot to the channel `/invite @YOUR_BOT_NAME`
 
 ### Play with it on the Slack
 
