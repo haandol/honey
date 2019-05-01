@@ -85,13 +85,11 @@ class Robot(object):
             raise e
         self.logger.info('RTM Connected.')
 
-    async def read_message(self):
+    def read_message(self):
         try:
             return self.client.rtm_read()
         except:
             self.logger.error(traceback.format_exc())
-            # try to recover connection
-            await self.rtm_connect()
 
     async def run(self):
         await self.brain.connect()
@@ -102,7 +100,7 @@ class Robot(object):
             )
 
         while True:
-            events = await self.read_message()
+            events = self.read_message()
             if events:
                 messages = self.extract_messages(events)
                 if messages:
@@ -127,10 +125,11 @@ class Robot(object):
 
 if '__main__' == __name__:
     robot = Robot()
+    loop = asyncio.get_event_loop()
+    future = asyncio.ensure_future(robot.run())
     try:
-        loop = asyncio.get_event_loop()
-        future = asyncio.ensure_future(robot.run())
         loop.run_until_complete(future)
+        loop.run_forever()
     finally:
         loop.run_until_complete(robot.disconnect())
         loop.close()
