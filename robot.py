@@ -111,7 +111,7 @@ class Robot(object):
                             loop.run_in_executor(
                                 executor,
                                 self.handle_message,
-                                *[message]
+                                message
                             )
                             for message in messages
                         ]
