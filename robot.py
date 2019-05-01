@@ -18,6 +18,7 @@ class Robot(object):
         self.client = SlackClient(SLACK_TOKEN)
         self.brain = RedisBrain()
         self.apps, self.docs = self.load_apps()
+        self.logger = logger
 
     def load_apps(self):
         docs = ['='*14, 'Usage', '='*14]
@@ -70,25 +71,25 @@ class Robot(object):
             return (text[CMD_LENGTH:], '')
 
     async def rtm_connect(self, timeout_secs=10):
-        logger.info('RTM Connecting...')
+        self.logger.info('RTM Connecting...')
         try:
             async with timeout(timeout_secs):
                 while not self.client.server.connected:
                     try:
                         self.client.rtm_connect(with_team_state=False)
                     except:
-                        logger.error(traceback.format_exc())
+                        self.logger.error(traceback.format_exc())
                     await asyncio.sleep(1)
         except asyncio.TimeoutError as e:
-            logger.error(traceback.format_exc())
+            self.logger.error(traceback.format_exc())
             raise e
-        logger.info('RTM Connected.')
+        self.logger.info('RTM Connected.')
 
     async def read_message(self):
         try:
             return self.client.rtm_read()
         except:
-            logger.error(traceback.format_exc())
+            self.logger.error(traceback.format_exc())
             # try to recover connection
             await self.rtm_connect()
 
@@ -121,7 +122,7 @@ class Robot(object):
     async def disconnect(self):
         self.brain.disconnect()
         self.client.server.websocket.close()
-        logger.info('RTM disconnected.')
+        self.logger.info('RTM disconnected.')
 
 
 if '__main__' == __name__:
@@ -133,4 +134,4 @@ if '__main__' == __name__:
     finally:
         robot.disconnect()
         loop.close()
-        logger.info('Honey Shutdown.')
+        self.logger.info('Honey Shutdown.')

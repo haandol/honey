@@ -1,4 +1,4 @@
-from .decorators import on_command
+from . import on_command
 
 
 HELP_MSG = [

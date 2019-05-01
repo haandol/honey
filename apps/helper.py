@@ -1,4 +1,4 @@
-from .decorators import on_command
+from . import on_command
 
 @on_command(['ㄷㅇ', '도움', 'help'])
 def run(robot, channel, user, tokens):
