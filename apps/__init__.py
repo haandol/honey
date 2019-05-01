@@ -51,6 +51,7 @@ def on_command(commands):
                         robot.logger.warning('Can not send to empty channel')
                 except:
                     robot.logger.error('Can not deliver the message because...')
+                    robot.logger.error(traceback.format_exc())
             return None
         return _decorator
     return decorator

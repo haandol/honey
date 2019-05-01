@@ -4,9 +4,9 @@ sys.path.append(os.path.abspath('.'))
 
 import time
 import traceback
-import concurrent.futures
 from importlib import import_module
 from slackclient import SlackClient
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 from brain import RedisBrain
 from loggers import logger, level
@@ -98,17 +98,17 @@ class Robot(object):
             if events:
                 messages = self.extract_messages(events)
                 if messages:
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
                         try:
                             executor.map(self.handle_message, messages)
-                        except concurrent.futures.TimeoutError:
+                        except TimeoutError:
                             self.logger.error(traceback.format_exc())
             else:
                 time.sleep(0.3)
 
     def disconnect(self):
-        self.brain.disconnect()
-        self.client.server.websocket.close()
+        if self.client and self.client.server and self.client.server.websocket:
+            self.client.server.websocket.close()
         self.logger.info('RTM disconnected.')
 
 

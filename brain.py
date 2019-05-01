@@ -7,7 +7,7 @@ from settings import REDIS_URL, REDIS_PORT, MAX_CONNECTION
 
 class RedisBrain(object):
     def __init__(self):
-        self.redis = self.connect()
+        self.redis = None
 
     def connect(self):
         if not REDIS_URL:
@@ -20,9 +20,9 @@ class RedisBrain(object):
                 host=REDIS_URL, port=REDIS_PORT,
                 max_connections=MAX_CONNECTION, db=0
             )
-            conn = redis.Redis(connection_pool=pool)
+            self.redis = redis.Redis(connection_pool=pool)
+            self.redis.set('foo', 'bar')
             logger.info('Brain Connected: {}'.format(REDIS_URL))
-            return conn
         except Exception as e:
             logger.error(traceback.format_exc())
             raise e
@@ -54,10 +54,3 @@ class RedisBrain(object):
 
         value = self.redis.lpop(key)
         return value.decode('utf-8') if value else ''
-
-    def disconnect(self):
-        if not self.redis:
-            return
-
-        self.redis.close()
-        logger.info('Brain disconnected.')
