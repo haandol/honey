@@ -6,10 +6,11 @@ import traceback
 from async_timeout import timeout
 from importlib import import_module
 from slackclient import SlackClient
+from concurrent.futures import ThreadPoolExecutor
 
 from loggers import logger
 from brain import RedisBrain
-from settings import APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN
+from settings import APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, MAX_WORKERS
 
 
 class Robot(object):
@@ -32,7 +33,7 @@ class Robot(object):
 
         return apps, docs
 
-    async def handle_message(self, message):
+    def handle_message(self, message):
         channel, user, text = message
 
         command, payloads = self.extract_command(text)
@@ -44,7 +45,7 @@ class Robot(object):
             return
 
         try:
-            await app.run(self, channel, user, payloads)
+            app.run(self, channel, user, payloads)
         except:
             traceback.print_exc()
 
@@ -104,8 +105,16 @@ class Robot(object):
             if events:
                 messages = self.extract_messages(events)
                 if messages:
-                    tasks = [asyncio.ensure_future(self.handle_message(message))
-                             for message in messages]
+                    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                        loop = asyncio.get_event_loop()
+                        tasks = [
+                            loop.run_in_executor(
+                                executor,
+                                self.handle_message,
+                                *[message]
+                            )
+                            for message in messages
+                        ]
                     await asyncio.gather(*tasks)
             await asyncio.sleep(0.3)
 
@@ -119,7 +128,8 @@ if '__main__' == __name__:
     robot = Robot()
     try:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(robot.run())
+        future = asyncio.ensure_future(robot.run())
+        loop.run_until_complete(future)
     finally:
         robot.disconnect()
         loop.close()

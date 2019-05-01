@@ -1,6 +1,9 @@
 # https://{$YOUR_TEAM}.slack.com/apps/manage/custom-integrations
 SLACK_TOKEN = ''
 
+# number of workers
+MAX_WORKERS = 20
+
 # set redis url if you want to enable redis related functions like redis_brain
 REDIS_URL = None    # redis://localhost:6379
 

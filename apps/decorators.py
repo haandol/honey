@@ -24,11 +24,11 @@ def on_command(commands):
         func.commands = commands
 
         @wraps(func)
-        async def _decorator(robot, channel, user, message):
+        def _decorator(robot, channel, user, message):
             if commands:
                 tokens = _extract_tokens(message)
                 try:
-                    channel, message = await func(robot, channel, user, tokens)
+                    channel, message = func(robot, channel, user, tokens)
                     logger.debug('[Debug] message: {}'.format(message))
                     if channel:
                         if dict == type(message) and 'text' in message:
