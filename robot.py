@@ -74,11 +74,7 @@ class Robot(object):
         self.logger.info('RTM Connecting...')
         try:
             async with timeout(timeout_secs):
-                while not self.client.server.connected:
-                    try:
-                        self.client.rtm_connect(with_team_state=False)
-                    except:
-                        self.logger.error(traceback.format_exc())
+                while not self.client.rtm_connect(with_team_state=False):
                     await asyncio.sleep(1)
         except asyncio.TimeoutError as e:
             self.logger.error(traceback.format_exc())
@@ -126,10 +122,8 @@ class Robot(object):
 if '__main__' == __name__:
     robot = Robot()
     loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(robot.run())
     try:
-        loop.run_until_complete(future)
-        loop.run_forever()
+        loop.run_until_complete(robot.run())
     finally:
         loop.run_until_complete(robot.disconnect())
         loop.close()
