@@ -132,6 +132,6 @@ if '__main__' == __name__:
         future = asyncio.ensure_future(robot.run())
         loop.run_until_complete(future)
     finally:
-        robot.disconnect()
-        robot.logger.info('Honey Shutdown.')
+        loop.run_until_complete(robot.disconnect())
         loop.close()
+        robot.logger.info('Honey Shutdown.')
