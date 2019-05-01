@@ -133,5 +133,5 @@ if '__main__' == __name__:
         loop.run_until_complete(future)
     finally:
         robot.disconnect()
+        robot.logger.info('Honey Shutdown.')
         loop.close()
-        self.logger.info('Honey Shutdown.')
