@@ -103,6 +103,7 @@ class Robot(object):
                             executor.map(self.handle_message, messages)
                         except concurrent.futures.TimeoutError:
                             self.logger.error(traceback.format_exc())
+            else:
                 time.sleep(0.3)
 
     def disconnect(self):
