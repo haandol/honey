@@ -1,11 +1,12 @@
 import os
 import sys
-import time
 sys.path.append(os.path.abspath('.'))
+
+import time
 import traceback
+import concurrent.futures
 from importlib import import_module
 from slackclient import SlackClient
-from concurrent.futures import ThreadPoolExecutor
 
 from brain import RedisBrain
 from loggers import logger, level
@@ -82,6 +83,7 @@ class Robot(object):
             raise e
         except Exception as e:
             self.logger.error(traceback.format_exc())
+            self.rtm_connect()
 
     def run(self):
         self.brain.connect()
@@ -96,9 +98,11 @@ class Robot(object):
             if events:
                 messages = self.extract_messages(events)
                 if messages:
-                    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-                        for message in messages:
-                            executor.submit(self.handle_message, message)
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                        try:
+                            executor.map(self.handle_message, messages)
+                        except concurrent.futures.TimeoutError:
+                            self.logger.error(traceback.format_exc())
                 time.sleep(0.3)
 
     def disconnect(self):
