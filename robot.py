@@ -1,15 +1,14 @@
 import os
 import sys
+import time
 sys.path.append(os.path.abspath('.'))
-import asyncio
 import traceback
-from async_timeout import timeout
 from importlib import import_module
 from slackclient import SlackClient
 from concurrent.futures import ThreadPoolExecutor
 
-from loggers import logger
 from brain import RedisBrain
+from loggers import logger, level
 from settings import APPS, CMD_PREFIX, CMD_LENGTH, SLACK_TOKEN, MAX_WORKERS
 
 
@@ -48,7 +47,7 @@ class Robot(object):
         try:
             app.run(self, channel, user, payloads)
         except:
-            traceback.print_exc()
+            self.logger.error(traceback.format_exc())
 
     def extract_messages(self, events):
         messages = []
@@ -70,26 +69,23 @@ class Robot(object):
         else:
             return (text[CMD_LENGTH:], '')
 
-    async def rtm_connect(self, timeout_secs=10):
-        self.logger.info('RTM Connecting...')
-        try:
-            async with timeout(timeout_secs):
-                while not self.client.rtm_connect(with_team_state=False):
-                    await asyncio.sleep(1)
-        except asyncio.TimeoutError as e:
-            self.logger.error(traceback.format_exc())
-            raise e
+    def rtm_connect(self):
+        while not self.client.rtm_connect(with_team_state=False):
+            self.logger.info('RTM Connecting...')
+            time.sleep(1)
         self.logger.info('RTM Connected.')
 
     def read_message(self):
         try:
             return self.client.rtm_read()
-        except:
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception as e:
             self.logger.error(traceback.format_exc())
 
-    async def run(self):
-        await self.brain.connect()
-        await self.rtm_connect()
+    def run(self):
+        self.brain.connect()
+        self.rtm_connect()
         if not self.client.server.connected:
             raise RuntimeError(
                 'Can not connect to slack client. Check your settings.'
@@ -101,19 +97,11 @@ class Robot(object):
                 messages = self.extract_messages(events)
                 if messages:
                     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-                        loop = asyncio.get_event_loop()
-                        tasks = [
-                            loop.run_in_executor(
-                                executor,
-                                self.handle_message,
-                                message
-                            )
-                            for message in messages
-                        ]
-                    await asyncio.gather(*tasks)
-            await asyncio.sleep(0.3)
+                        for message in messages:
+                            executor.submit(self.handle_message, message)
+                time.sleep(0.3)
 
-    async def disconnect(self):
+    def disconnect(self):
         self.brain.disconnect()
         self.client.server.websocket.close()
         self.logger.info('RTM disconnected.')
@@ -121,10 +109,10 @@ class Robot(object):
 
 if '__main__' == __name__:
     robot = Robot()
-    loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(robot.run())
+        robot.run()
+    except KeyboardInterrupt as e:
+        robot.logger.info('Honey Shutdown By User.')
     finally:
-        loop.run_until_complete(robot.disconnect())
-        loop.close()
+        robot.disconnect()
         robot.logger.info('Honey Shutdown.')

@@ -1,7 +1,8 @@
 import logging
 
+level = logging.DEBUG
 logger = logging.getLogger('honey')
-logger.setLevel(logging.INFO)
+logger.setLevel(level)
 
 log_file_handler = logging.FileHandler('honey.log')
 formatter = logging.Formatter(
