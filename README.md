@@ -23,6 +23,8 @@ Like Django, you can config your bot by editing `settings.py`
 set `SLACK_TOKEN` variable in settings.py.
 if `REDIS_URL` is not setted, all Redis relevant features, like redis_brain, will be disabled.
 
+[한국어 튜토리얼](https://haandol.github.io/2019/04/30/making-python-slackbot-with-honey-tutorial.html)
+
 ### Congiure your bot
 
 1. install dependencies
