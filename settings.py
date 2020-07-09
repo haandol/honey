@@ -16,4 +16,4 @@ CMD_PREFIX = '!'
 CMD_LENGTH = len(CMD_PREFIX)
 
 # add your app name to this list
-APPS = ['helper', 'hello_world', 'fake']
+APPS = ['helper', 'hello_world']
