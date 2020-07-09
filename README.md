@@ -35,6 +35,8 @@ if `REDIS_URL` is not setted, all Redis relevant features, like redis_brain, wil
 6. Run `$python robot.py`. Python 3.5.3+ is required.
 7. Invite your bot to the channel `/invite @YOUR_BOT_NAME`
 
+> 👹 2nd step is important because RTM is working only with legacy bot.
+
 ### Play with it on the Slack
 
 Type command with Command Prefix (default is `!` ) on the channel where the bot is on.
