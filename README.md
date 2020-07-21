@@ -6,7 +6,7 @@ A neat [Slack](slack.com) bot for Pythonistas
 
 ## Dependencies
 
-Python 3.5.3+ (for `async/await`)
+Python 3.4+
 
 [redis](https://github.com/andymccurdy/redis-py), [slackclient](https://github.com/slackhq/python-slackclient).
 
@@ -57,14 +57,14 @@ Built-in and example apps are in the `apps` directory.
 
 ### App and Command
 
-Below is basic form of app. notice that the function has prefix, `async`.
+Below is basic form of app.
 This just says `Hello world!!` to the channel when user typed the command, `!hi`.
 
 ```python
 from .decorators import on_command
 
 @on_command(['hi', 'hello', '하이', 'ㅎㅇ'])
-async def hello_world(robot, channel, user, tokens):
+def hello_world(robot, channel, user, tokens):
     '''
         Simple app just says `Hello word!!`
 
@@ -91,7 +91,7 @@ Let's assume that you typed `!memo remember this` with blow app.
 
 ```python
 @on_command(['memo'])
-async def remember(robot, channel, user, tokens):
+def remember(robot, channel, user, tokens):
     assert 2 == len(tokens)
     assert 'remember' == tokens[0]
     assert 'this' == tokens[1]
